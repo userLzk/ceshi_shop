@@ -3,7 +3,7 @@ package server
 import (
 	"fmt"
 
-	"ceshi_shop/pkg"
+	"ceshi_shop/pkg/jwt"
 	"github.com/gin-gonic/gin"
 )
 
@@ -15,11 +15,10 @@ type loginController struct {
 }
 
 func Login(g *gin.Context) {
-	car := pkg.NewCarryData("zhagnsan", 17)
-
-	token := pkg.EncryptionToken(car)
-	tokenDesc, _ := pkg.DecryptionToken(token)
-	fmt.Printf("\nss", tokenDesc)
+	car := jwt.NewCarryData("zhagnsan", 17)
+	token := jwt.EncryptionToken(car)
+	tokenDesc, _ := jwt.DecryptionToken(token)
+	fmt.Printf("\nss%v\n", tokenDesc)
 	println(token)
 	//g.String(200, token1.UserName)
 	g.String(200, "json", token)
@@ -31,8 +30,9 @@ func Login(g *gin.Context) {
 
 func GetToken(g *gin.Context) {
 	token := g.PostForm("token")
-	tokenDesc, _ := pkg.DecryptionToken(token)
-	fmt.Printf("\nss", tokenDesc.ExpiresAt)
+	println(token)
+	//tokenDesc, _ := pkg.DecryptionToken(token)
+	//fmt.Printf("\nss", tokenDesc.ExpiresAt)
 	//println(token1.UserName)
 	//g.String(200, token1.UserName)
 	//ctx.ReturnJson(200, context.Context{ReturnStruct: map[string]interface{}{

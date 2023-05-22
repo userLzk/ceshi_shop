@@ -1,4 +1,4 @@
-package pkg
+package jwt
 
 import (
 	"fmt"
@@ -26,29 +26,28 @@ type JwtController struct {
 }
 
 //自定义结构存储
-func NewCarryData(userName string, age int) *CarryData {
-	return &CarryData{
+func NewCarryData(userName string, age int) CarryData {
+	return CarryData{
 		UserName: userName,
 		UserAge:  age,
 	}
 }
 
 //生成验证token
-func EncryptionToken(Car *CarryData) (token string) {
+func EncryptionToken(Car CarryData) (token string) {
 
 	//签证生产时间创建
-	Iat := time.Now().Unix()
-	//签证过期时间
-	ExT := Iat + int64(time.Second*3600)
+	Iat := time.Now().Add(time.Second * 3600)
 
 	newClaims := ClaimsCustom{
-		CarryData: *Car,
+		CarryData: Car,
 		StandardClaims: jwt.StandardClaims{
-			Issuer:    "test",
-			IssuedAt:  Iat, //签证生成时间
-			ExpiresAt: ExT, //签证有效期
+			Issuer: "test",
+			//IssuedAt:  Iat, //签证生成时间
+			ExpiresAt: Iat.Unix(), //签证有效期
 		},
 	}
+	fmt.Sprintf("cl::", newClaims)
 	//初始化token结构
 	tokenStructure := jwt.NewWithClaims(jwt.SigningMethodHS256, newClaims)
 	//生成token
@@ -72,4 +71,20 @@ func DecryptionToken(signing string) (*ClaimsCustom, error) {
 		return claims, nil
 	}
 	return nil, err
+}
+
+//更新token信息
+func RenewToken(claims ClaimsCustom) string {
+
+	if withinLimit(claims.ExpiresAt, 6) {
+
+		return EncryptionToken(claims.CarryData)
+	}
+	return ""
+}
+
+//检测是否满足续签条件
+func withinLimit(s int64, l int64) bool {
+	now := time.Now().Unix()
+	return now-s < l
 }
