@@ -45,6 +45,10 @@ func LoadMysqlClient() *sql.DB {
 	)
 	//获取配置
 	Db, err := sql.Open("mysql", conn)
+	//设置最大连接数
+	Db.SetMaxIdleConns(100)
+	//设置最大空闲连接数
+	Db.SetMaxIdleConns(10)
 	if err != nil {
 		log.Printf("mysql open err:%v\n", err)
 	}

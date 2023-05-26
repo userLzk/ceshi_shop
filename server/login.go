@@ -1,7 +1,7 @@
 package server
 
 import (
-	"fmt"
+	"net/http"
 
 	"ceshi_shop/pkg/jwt"
 	"github.com/gin-gonic/gin"
@@ -16,27 +16,21 @@ type loginController struct {
 
 func Login(g *gin.Context) {
 	car := jwt.NewCarryData("zhagnsan", 17)
-	token := jwt.EncryptionToken(car)
-	tokenDesc, _ := jwt.DecryptionToken(token)
-	fmt.Printf("\nss%v\n", tokenDesc)
-	println(token)
-	//g.String(200, token1.UserName)
-	g.String(200, "json", token)
-	//g.ReturnJson(200, context.Context{ReturnStruct: map[string]interface{}{
-	//	"code": 1,
-	//	"msg":  "okk",
-	//}})
+	accessToken, refreshToken := jwt.EncryptionToken(car)
+	jwt.DecryptionToken(accessToken, refreshToken)
+	g.JSON(http.StatusOK, gin.H{
+		"code": 200,
+		"msg":  "鉴权成功",
+		"data": gin.H{
+			"accessToken":  accessToken,
+			"refreshToken": refreshToken,
+		},
+	})
 }
 
 func GetToken(g *gin.Context) {
-	token := g.PostForm("token")
-	println(token)
-	//tokenDesc, _ := pkg.DecryptionToken(token)
-	//fmt.Printf("\nss", tokenDesc.ExpiresAt)
-	//println(token1.UserName)
-	//g.String(200, token1.UserName)
-	//ctx.ReturnJson(200, context.Context{ReturnStruct: map[string]interface{}{
-	//	"code": 1,
-	//	"msg":  "okk",
-	//}})
+	//logrus.WithFields()
+	g.JSON(http.StatusOK, gin.H{"code": 200,
+		"msg": "鉴权成功"})
+
 }
